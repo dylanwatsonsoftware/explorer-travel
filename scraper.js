@@ -3,6 +3,7 @@
 var cheerio = require("cheerio");
 var request = require("request");
 var sqlite3 = require("sqlite3").verbose();
+var Kayak = require('./pages/kayak')
 
 function initDatabase(callback) {
 	// Set up sqlite database.
@@ -27,33 +28,18 @@ function readRows(db) {
 	});
 }
 
-function fetchPage(url, callback) {
-	// Use request to read in pages.
-	request(url, function (error, response, body) {
-		if (error) {
-			console.log("Error requesting page: " + error);
-			return;
-		}
+async function fetchPage(db) {
+	updateRow(db, await Kayak.search("PER"));
+	updateRow(db, await Kayak.search("KUL"));
+	updateRow(db, await Kayak.search("SIN"));
 
-		callback(body);
-	});
+	readRows(db);
+
+	db.close();
 }
 
-function run(db) {
-	// Use request to read in pages.
-	fetchPage("https://morph.io", function (body) {
-		// Use cheerio to find things in the page with css selectors.
-		var $ = cheerio.load(body);
-
-		var elements = $("div.media-body span.p-name").each(function () {
-			var value = $(this).text().trim();
-			updateRow(db, value);
-		});
-
-		readRows(db);
-
-		db.close();
-	});
+async function run(db) {
+	fetchPage(db);
 }
 
 initDatabase(run);
