@@ -7,22 +7,23 @@ function initDatabase(callback) {
 	// Set up sqlite database.
 	var db = new sqlite3.Database("data.sqlite");
 	db.serialize(function() {
-		db.run("CREATE TABLE IF NOT EXISTS data (name TEXT)");
+		db.run("CREATE TABLE IF NOT EXISTS data (name TEXT, value TEXT)");
 		callback(db);
 	});
 }
 
-function updateRow(db, value) {
+function updateRow(db, name, value) {
 	// Insert some data.
-	var statement = db.prepare("INSERT INTO data VALUES (?)");
-	statement.run(value);
+	console.log(JSON.stringify(value))
+	var statement = db.prepare("INSERT INTO data VALUES (?, ?)");
+	statement.run(name, value);
 	statement.finalize();
 }
 
 function readRows(db) {
 	// Read some data.
-	db.each("SELECT rowid AS id, name FROM data", function(err, row) {
-		console.log(row.id + ": " + row.name);
+	db.each("SELECT rowid AS id, name, value FROM data", function(err, row) {
+		console.log(row.name + ":" + row.value);
 	});
 }
 
