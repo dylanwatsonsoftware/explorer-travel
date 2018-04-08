@@ -1,7 +1,5 @@
 // This is a template for a Node.js scraper on morph.io (https://morph.io)
 
-var cheerio = require("cheerio");
-var request = require("request");
 var sqlite3 = require("sqlite3").verbose();
 var Kayak = require('./pages/kayak')
 
